@@ -2,7 +2,7 @@ import requests
 
 from django.conf import settings
 from django.utils.translation import ugettext as _
-from restless.http import Http400
+from restless.http import Http201, Http400
 from restless.models import serialize
 from restless.modelviews import ListEndpoint, DetailEndpoint
 
@@ -43,15 +43,15 @@ class AddressListView(ListEndpoint):
             )
         ).json()
 
-        Address.objects.create(
+        obj = Address.objects.create(
             zipcode=response['cep'],
-            address=response['logradouro'],
-            neighborhood=response['bairro'],
+            address=response.get('logradouro'),  # nullable
+            neighborhood=response.get('bairro'),  # nullable
             state=response['estado'],
             city=response['cidade'],
         )
 
-        return response
+        return Http201(self.serialize(obj))
 
 
 class AddressDetailView(DetailEndpoint):
