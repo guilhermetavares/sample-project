@@ -32,6 +32,7 @@ INSTALLED_APPS = (
 
     # own
     'addresses',
+    'history',
 )
 
 MIDDLEWARE_CLASSES = (
