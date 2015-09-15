@@ -1,6 +1,9 @@
 import re
 
 from django import forms
+from django.utils.translation import ugettext_lazy as _
+
+from .models import Address
 
 
 RE_NOTNUMBER = re.compile(r'[^0-9]')
