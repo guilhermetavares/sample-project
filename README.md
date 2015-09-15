@@ -2,6 +2,7 @@ Sample project
 ==============
 
 [![Build Status](https://travis-ci.org/LuanP/sample-project.svg?branch=master)](https://travis-ci.org/LuanP/sample-project)
+[![Coverage Status](https://coveralls.io/repos/LuanP/sample-project/badge.svg?branch=master&service=github)](https://coveralls.io/github/LuanP/sample-project?branch=master)
 
 Prerequisites:
 
