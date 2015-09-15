@@ -2,7 +2,7 @@ import requests
 
 from django.conf import settings
 from django.utils.translation import ugettext as _
-from restless.http import Http201, Http400
+from restless.http import Http201, Http400, Http404
 from restless.models import serialize
 from restless.modelviews import ListEndpoint, DetailEndpoint
 
@@ -30,18 +30,22 @@ class AddressListView(ListEndpoint):
             zipcode = request.data.get('zip_code')
 
         if not zipcode:
-            return Http400(_(u'zipcode not sent'))
+            return Http400(_('zipcode not sent'))
 
         form = ZipCodeForm({'zipcode': zipcode})
         if not form.is_valid():
-            return Http400(_(u'invalid data'), errors=form.errors)
+            return Http400(_('invalid data'), errors=form.errors)
 
         response = requests.get(
             '{}{}'.format(
                 settings.ZIPCODE_API_URL,
                 form.cleaned_data['zipcode']
             )
-        ).json()
+        )
+        if response.status_code == 404:
+            return Http404(_(u'zipcode not found'))
+
+        response = response.json()
 
         obj = Address.objects.create(
             zipcode=response['cep'],

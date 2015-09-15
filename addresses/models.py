@@ -19,3 +19,6 @@ class Address(models.Model):
 
     def __unicode__(self):
         return self.zipcode
+
+    def get_key(self):
+        return self.zipcode

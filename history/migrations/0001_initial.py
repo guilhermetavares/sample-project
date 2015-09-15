@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
                 ('model', models.CharField(max_length=255, verbose_name='model')),
                 ('key', models.CharField(max_length=255, verbose_name='key')),
                 ('action', models.CharField(max_length=255, verbose_name='action')),
-                ('date', models.DateTimeField(verbose_name='date')),
+                ('date', models.DateTimeField(auto_now_add=True, verbose_name='date')),
             ],
             options={
                 'verbose_name': 'history log',
