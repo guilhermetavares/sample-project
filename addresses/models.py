@@ -12,6 +12,7 @@ class Address(models.Model):
     )
     state = models.CharField(_(u'state'), max_length=2)
     city = models.CharField(_(u'city'), max_length=255)
+    address2 = models.CharField(_(u'address2'), max_length=255, null=True)
 
     class Meta:
         verbose_name = _(u'address')
