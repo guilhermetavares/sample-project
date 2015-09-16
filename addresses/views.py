@@ -2,7 +2,7 @@ import requests
 
 from django.conf import settings
 from django.utils.translation import ugettext as _
-from restless.http import Http201, Http400, Http404
+from restless.http import Http201, Http400, Http404, JSONResponse
 from restless.models import serialize
 from restless.modelviews import ListEndpoint, DetailEndpoint
 
@@ -10,18 +10,34 @@ from .forms import ZipCodeForm
 from .models import Address
 
 
-class AddressListView(ListEndpoint):
-    model = Address
-    fields = ('city', 'neighborhood', 'zipcode', 'state', 'address')
+class FieldsMixin(object):
+    fields = NotImplemented
 
     def serialize(self, objs):
         return serialize(objs, fields=self.fields)
 
+
+class Http204(JSONResponse):
+    status_code = 204
+
+
+class AddressListView(FieldsMixin, ListEndpoint):
+    model = Address
+    fields = ('city', 'neighborhood', 'zipcode', 'state', 'address',
+              'address2')
+
     def get_query_set(self, request, *args, **kwargs):
         qs = super(AddressListView, self).get_query_set(request, *args,
                                                         **kwargs)
-        if request.params.get('limit'):
-            qs = qs.limit(request.params['limit'])
+        # TODO implement a start
+        limit = request.params.get('limit')
+        if limit:
+            try:
+                limit = int(limit)
+            except ValueError:
+                return Http400(_('invalid limit'))
+            else:
+                qs = qs[:limit]
         return qs
 
     def post(self, request, *args, **kwargs):
@@ -53,12 +69,20 @@ class AddressListView(ListEndpoint):
             neighborhood=response.get('bairro'),  # nullable
             state=response['estado'],
             city=response['cidade'],
+            address2=response.get('complemento'),  # nullable
         )
 
         return Http201(self.serialize(obj))
 
 
-class AddressDetailView(DetailEndpoint):
+class AddressDetailView(FieldsMixin, DetailEndpoint):
     model = Address
     lookup_field = 'zipcode'
     methods = ['GET', 'DELETE']
+    fields = ('city', 'neighborhood', 'zipcode', 'state', 'address',
+              'address2')
+
+    def delete(self, request, *args, **kwargs):
+        response = super(AddressDetailView, self).delete(request, *args,
+                                                         **kwargs)
+        return Http204({})
