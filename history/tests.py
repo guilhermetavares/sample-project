@@ -21,6 +21,19 @@ class HistoryTest(TestCase):
         for address in default_test_data:
             Address.objects.create(**address)
 
+    def test_history_created(self):
+        self.create_data()
+        address_count = Address.objects.count()
+        history_count = History.objects.count()
+        self.assertEqual(address_count, history_count)
+
+    def test_history_delete(self):
+        self.create_data()
+        address_count_before_delete = Address.objects.count()
+        Address.objects.first().delete()
+        history_count = History.objects.count()
+        self.assertEqual(address_count_before_delete + 1, history_count)
+
     def test_history_unicode(self):
         self.create_data()
         history = History.objects.first()
